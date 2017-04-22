@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-/// <summary>
+﻿/// <summary>
 /// Interface for handling events in the EventManager class.
 /// </summary>
 public interface IEventListener 

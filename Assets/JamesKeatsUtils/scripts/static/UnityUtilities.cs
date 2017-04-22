@@ -10,6 +10,8 @@ namespace UnityUtils
     /// </summary>
 	public static class UnityUtilities
 	{
+        public delegate void CallOnCompleteT();
+
         // Use a static System.Random to avoid conflicts with the Unity Random.
 		private static readonly System.Random RNG = new System.Random();
 
