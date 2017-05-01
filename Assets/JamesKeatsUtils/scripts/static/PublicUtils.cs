@@ -106,39 +106,7 @@ public static class PublicUtils
     {
         return (a - b).sqrMagnitude;
     }
-
-    public static IEnumerator moveOverSecondsWithEasing(GameObject objectToMove, Vector3 end, float seconds, CallOnCompleteT func = null)
-    {
-        float elapsedTime = 0;
-        Vector3 startingPos = objectToMove.transform.position;
-
-        while (elapsedTime < seconds)
-        {
-            // -6 * (x^3 / 3 - x^2 / 2)     is a good, cheap smoothing formula. Go graph it.
-            // 1/2 * ((2x - 1) ^ 1/3 + 1)   is an even better one, assuming you have a bit more power and/or time to run it.
-            float currentPercent = 0.5f * (Mathf.Pow(2 * (elapsedTime / seconds), 1f / 3f) + 1f);
-
-            objectToMove.transform.position = Vector3.Lerp(startingPos, end, currentPercent);
-            elapsedTime += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-
-        objectToMove.transform.position = end;
-
-        if (func != null)
-            func();
-    }
-
-    public static T randomEnum<T>()
-    {
-        Type type = typeof(T);
-        Array values = Enum.GetValues(type);
-
-        var choice = Random.Range(0, values.Length);
-
-        object value = values.GetValue(choice);
-        return (T)Convert.ChangeType(value, type);
-    }
+    
 
     public static IEnumerator lerpLightIntensity(Light light, float newIntensity, float time)
     {
