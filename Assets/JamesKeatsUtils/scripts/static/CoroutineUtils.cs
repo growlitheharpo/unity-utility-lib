@@ -162,5 +162,34 @@ namespace KeatsLib.Unity
 
             obj.transform.localScale = scale;
         }
+
+        /// <summary>
+        /// Lerps the intensity of a light over the amount of time provided.
+        /// </summary>
+        /// <param name="light">The light to lerp.</param>
+        /// <param name="newIntensity">The new target intensity value.</param>
+        /// <param name="time">The amount of time to lerp over.</param>
+        /// <param name="tScale">The method used to evaluate T as the lerp occurs. Defaults to linear.</param>
+        /// <param name="callback">Function to call when this lerp has completed.</param>
+        public static IEnumerator lerpLightIntensity(Light light, float newIntensity, float time, PercentageEvaluator tScale = null, CallOnComplete callback = null)
+        {
+            if (tScale == null)
+                tScale = LINEAR_EVALUATOR;
+
+            float elapsedTime = 0.0f, startingVal = light.intensity;
+
+            while (elapsedTime < time)
+            {
+                light.intensity = Mathf.Lerp(startingVal, newIntensity, tScale(elapsedTime, time));
+
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            light.intensity = newIntensity;
+
+            if (callback != null)
+                callback();
+        }
     }
 }

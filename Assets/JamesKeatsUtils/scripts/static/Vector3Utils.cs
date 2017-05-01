@@ -44,6 +44,58 @@ namespace KeatsLib.Unity
         }
 
         /// <summary>
+        /// Gets a random position with a Transform's bounding box.
+        /// </summary>
+        /// <param name="cube">The Transform within which to generate a position.</param>
+        /// <returns>A valid position.</returns>
+        public static Vector3 RandomContainedPosition(Transform cube)
+        {
+            Vector3 rndPosWithin = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f));
+            rndPosWithin = cube.TransformPoint(rndPosWithin * 0.5f);
+
+            return rndPosWithin;
+        }
+
+        /// <summary>
+        /// Checks if a position provided is within a Transform's bounding box.
+        /// </summary>
+        /// <param name="point">The position to check.</param>
+        /// <param name="cube">The Transform cube to check.</param>
+        /// <returns>True if the point is inside cube. Otherwise, false.</returns>
+        public static bool CubeContains(Vector3 point, Transform cube)
+        {
+            if (cube == null)
+                return false;
+
+            Vector3 pointScale = cube.InverseTransformPoint(point) * 2.0f;
+
+            return pointScale.x.IsBetween(-1.0f, 1.0f) && pointScale.y.IsBetween(-1.0f, 1.0f) && pointScale.z.IsBetween(-1.0f, 1.0f);
+        }
+
+        /// <summary>
+        /// Get the distance from a point to the nearest point on a cube.
+        /// </summary>
+        /// <returns>The distance from the point to the nearest position on the cube.</returns>
+        public static float DistanceCubePoint(Vector3 point, Transform cube)
+        {
+            Vector3 boxMin = new Vector3(cube.position.x - cube.localScale.x / 2.0f, cube.position.y - cube.localScale.y / 2.0f, cube.position.z - cube.localScale.z / 2.0f);
+            Vector3 boxMax = new Vector3(cube.position.x + cube.localScale.x / 2.0f, cube.position.y + cube.localScale.y / 2.0f, cube.position.z + cube.localScale.z / 2.0f);
+
+            Vector3 closestPoint = point.ClampComponentwise(boxMin, boxMax);
+            return Vector3.Distance(point, closestPoint);
+        }
+
+        /// <summary>
+        /// Get the distance from a point to the nearest point on a cube.
+        /// </summary>
+        /// <returns>The distance from the point to the nearest position on the cube.</returns>
+        public static float DistanceCubePoint(Vector3 point, Bounds cube)
+        {
+            Vector3 closestPoint = point.ClampComponentwise(cube.min, cube.max);
+            return Vector3.Distance(point, closestPoint);
+        }
+
+        /// <summary>
         /// Provide a copy of a Vector with its magnitude clamped to maxMagnitude.
         /// </summary>
         /// <param name="v">The Vector to copy.</param>
