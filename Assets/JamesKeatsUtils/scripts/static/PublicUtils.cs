@@ -14,90 +14,6 @@ using Random = UnityEngine.Random;
  * 
  * */
 
-public struct IteratorIndex
-{
-    private int mValue;
-    private int mSize;
-
-    public IteratorIndex(int size, int initialValue = 0)
-    {
-        mSize = size;
-
-        mValue = initialValue >= size ? size - 1 : initialValue;
-    }
-
-    public void setSize(int newSize)
-    {
-        mSize = newSize;
-    }
-
-    public void resetValue()
-    {
-        mValue = 0;
-    }
-
-    public static implicit operator int(IteratorIndex i)
-    {
-        return i.mValue;
-    }
-
-    public static IteratorIndex operator ++(IteratorIndex i)
-    {
-        i.mValue++;
-        if (i.mValue >= i.mSize)
-            i.mValue = 0;
-
-        return i;
-    }
-}
-
-// ReSharper disable InconsistentNaming, FieldCanBeMadeReadOnly.Local
-public class Pair<TX, TY>
-{
-    private TX _x;
-    private TY _y;
-
-    public Pair(TX first, TY second)
-    {
-        _x = first;
-        _y = second;
-    }
-
-    public TX first { get { return _x; } }
-
-    public TY second { get { return _y; } }
-
-    public override bool Equals(object obj)
-    {
-        if (obj == null)
-            return false;
-        if (obj == this)
-            return true;
-
-        Pair<TX, TY> other = obj as Pair<TX, TY>;
-        if (other == null)
-            return false;
-
-        return
-            (((first == null) && (other.first == null))
-                || ((first != null) && first.Equals(other.first)))
-              &&
-            (((second == null) && (other.second == null))
-                || ((second != null) && second.Equals(other.second)));
-    }
-
-    public override int GetHashCode()
-    {
-        int hashcode = 0;
-        if (first != null)
-            hashcode += first.GetHashCode();
-        if (second != null)
-            hashcode += second.GetHashCode();
-
-        return hashcode;
-    }
-}
-// ReSharper restore FieldCanBeMadeReadOnly.Local, InconsistentNaming 
 
 public static class PublicUtils
 {
@@ -166,25 +82,7 @@ public static class PublicUtils
 
         return pointScale.x.isBetween(-1.0f, 1.0f) && pointScale.y.isBetween(-1.0f, 1.0f) && pointScale.z.isBetween(-1.0f, 1.0f);
     }
-
-    public static IEnumerator lerpLocalScale(GameObject obj, float time, Vector3 newScale, CallOnCompleteT func = null)
-    {
-        Vector3 startScale = obj.transform.localScale;
-        float currentTime = 0.0f;
-
-        while (currentTime < time)
-        {
-            obj.transform.localScale = Vector3.Lerp(startScale, newScale, currentTime / time);
-            currentTime += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-
-        obj.transform.localScale = newScale;
-
-        if (func != null)
-            func();
-    }
-
+    
     public static IEnumerator lerpMaterialColor(Material m, Color newColor, float time, CallOnCompleteT func = null)
     {
         Color startCol = m.color;
@@ -207,26 +105,6 @@ public static class PublicUtils
     public static float Vector3DistanceSquared(Vector3 a, Vector3 b)
     {
         return (a - b).sqrMagnitude;
-    }
-
-    //The following function was copied from http://answers.unity3d.com/questions/572851/way-to-move-object-over-time.html
-    //as the simplest way to move an object to a position without using a tweening library or a redundant animation
-    public static IEnumerator moveOverSeconds(GameObject objectToMove, Vector3 end, float seconds, CallOnCompleteT func = null)
-    {
-        float elapsedTime = 0;
-        Vector3 startingPos = objectToMove.transform.position;
-
-        while (elapsedTime < seconds)
-        {
-            objectToMove.transform.position = Vector3.Lerp(startingPos, end, (elapsedTime / seconds));
-            elapsedTime += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-
-        objectToMove.transform.position = end;
-
-        if (func != null)
-            func();
     }
 
     public static IEnumerator moveOverSecondsWithEasing(GameObject objectToMove, Vector3 end, float seconds, CallOnCompleteT func = null)
@@ -308,55 +186,6 @@ namespace MySystemExtensions
 {
     public static class PublicUtilExtensions
     {
-        public static T toEnum<T>(this string value)
-        {
-            return (T)Enum.Parse(typeof(T), value, true);
-        }
-
-        public static T chooseRandom<T>(this LinkedList<T> list)
-        {
-            if (list.Count == 0)
-                throw new ArgumentException("Trying to choose a random item from an empty list!");
-
-            int index = (int)(Random.value * list.Count);
-            if (index >= list.Count)
-                index--;
-
-            LinkedListNode<T> n = list.First;
-            for (int i = 0; i != index; i++)
-            {
-	            if (n != null)
-	                n = n.Next;
-            }
-
-	        // ReSharper disable once PossibleNullReferenceException
-            return n.Value;
-        }
-
-        public static T chooseRandom<T>(this List<T> list)
-        {
-            if (list.Count == 0)
-                throw new ArgumentException("Trying to choose a random item from an empty list!");
-
-            int index = (int)(Random.value * list.Count);
-            if (index >= list.Count)
-                index--;
-
-            return list[index];
-        }
-
-        public static T chooseRandom<T>(this T[] list)
-        {
-            if (list.Length == 0)
-                throw new ArgumentException("Trying to choose a random item from an empty list!");
-
-            int index = (int)(Random.value * list.Length);
-            if (index >= list.Length)
-                index--;
-
-            return list[index];
-        }
-
         public static Vector3 greatestDistance(this Vector3 a, Vector3[] others)
         {
             float greatestDistance = -1.0f;
