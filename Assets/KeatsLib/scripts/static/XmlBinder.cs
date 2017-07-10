@@ -8,7 +8,7 @@ namespace KeatsLib.Unity
     /// <summary>
     /// A powerful utility script that binds private members in external classes to a value in an XML file.
     /// </summary>
-    public class XmlBinder : MonoBehaviour, IEventListener
+    public class XmlBinder : MonoBehaviour
     {
         /// <summary>A helper class that binds a property of any type (including value types) so they can be updated.
         /// Includes implicit conversion operators (in both directions) with type T for ease-of-use.</summary>
@@ -67,7 +67,7 @@ namespace KeatsLib.Unity
 
         private void Start()
         {
-            EventManager.registerListener(this, EventManager.EventType.INITIATE_XML_REFRESH);
+            EventManager.OnInitiateXmlRefresh += refreshData;
         }
 
         /// <summary>Initailizes a Field so that it can be dynamically updated at runtime.</summary>
@@ -139,6 +139,7 @@ namespace KeatsLib.Unity
             }
 
             updateLinkedFields();
+            EventManager.Notify(EventManager.XmlSuccesfullyRefreshed);
 
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
             StartCoroutine(showSuccessText());
@@ -152,17 +153,6 @@ namespace KeatsLib.Unity
             {
                 foreach (Field<float> field in pair.Value)
                     field.v = mData[pair.Key];
-            }
-        }
-
-        public void receiveEvent(EventManager.EventType e, object[] data)
-        {
-            switch (e)
-            {
-                case EventManager.EventType.INITIATE_XML_REFRESH:
-                    refreshData();
-                    EventManager.notify(EventManager.EventType.XML_SUCCESFULLY_RERESHED);
-                    break;
             }
         }
 
@@ -187,9 +177,11 @@ namespace KeatsLib.Unity
         private void OnGUI()
         {
             if (mShowSuccess)
+            {
                 GUI.Label(
                     new Rect(0.05f * Screen.width, 0.45f * Screen.width, 0.25f * Screen.height, 0.45f * Screen.height),
                     new GUIContent("XML Refresh successful!"));
+            }
         }
 #endif
     }
